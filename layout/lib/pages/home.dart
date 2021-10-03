@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:layout/pages/detail.dart';
 
+import 'package:http/http.dart' as http;
+import 'dart:async';
+
 class HomePage extends StatefulWidget {
   //const HomePage({ Key? key }) : super(key: key);
 
@@ -31,18 +34,21 @@ class _HomePageState extends State<HomePage> {
       body: Padding(
           padding: const EdgeInsets.all(20),
           child: FutureBuilder(
-            builder: (context, snapshot) {
-              var data = json.decode(snapshot.data.toString());
+            builder: (context, AsyncSnapshot snapshot) {
+              //var data = json.decode(snapshot.data.toString());
               return ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
-                  return MyBox(data[index]['title'], data[index]['subtitle'],
-                      data[index]['image_url'], data[index]['detail']);
+                  return MyBox(
+                      snapshot.data[index]['title'],
+                      snapshot.data[index]['subtitle'],
+                      snapshot.data[index]['image_url'],
+                      snapshot.data[index]['detail']);
                 },
-                itemCount: data.length,
+                itemCount: snapshot.data.length,
               );
             },
-            future:
-                DefaultAssetBundle.of(context).loadString('assets/data.json'),
+            future: getData(),
+            // future: DefaultAssetBundle.of(context).loadString('assets/data.json'),
           )),
     );
   }
@@ -58,7 +64,7 @@ class _HomePageState extends State<HomePage> {
         margin: EdgeInsets.only(top: 20),
         padding: EdgeInsets.all(20),
         //color: Colors.blue[50],
-        height: 150,
+        height: 185,
         decoration: BoxDecoration(
             //color: Colors.blue[50],
             borderRadius: BorderRadius.circular(20),
@@ -78,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.white,
                   fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
             Text(
               subtitle,
               style: TextStyle(
@@ -98,5 +104,15 @@ class _HomePageState extends State<HomePage> {
                 child: Text("อ่านต่อ"))
           ],
         ));
+  }
+
+  Future getData() async {
+    //https://raw.githubusercontent.com/michaelfu1/BasicAPI/main/data.json
+    var url = Uri.https(
+        'raw.githubusercontent.com', '/michaelfu1/BasicAPI/main/data.json');
+    //var url = Uri.https('raw.githubusercontent.com', '/UncleEngineer/BasicAPI/main/data.json');
+    var response = await http.get(url);
+    var result = json.decode(response.body);
+    return result;
   }
 }

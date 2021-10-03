@@ -14,7 +14,7 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    
     super.initState();
     _v1 = widget.v1;
     _v2 = widget.v2;
